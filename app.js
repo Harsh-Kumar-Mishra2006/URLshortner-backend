@@ -16,37 +16,38 @@ app.use(helmet());
 
 // 3. CORS - FIXED CONFIGURATION
 const allowedOrigins = [
-  'https://urlshortner-frontend-lkyq.onrender.com', // Your deployed frontend
-  'http://localhost:3001', // Local development
-  'http://localhost:3000'  // Common React localhost port
+  'https://urlshortner-frontend-lkyq.onrender.com',
+  'http://localhost:3001',
+  'http://localhost:3000'
 ];
 
-app.use(cors({
+const corsOptions = {
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
-    
-    // Allow all origins in development
-    if (process.env.NODE_ENV === 'development') {
-      return callback(null, true);
-    }
-    
-    // Check if the origin is allowed
     if (allowedOrigins.indexOf(origin) !== -1) {
       return callback(null, true);
     } else {
-      const msg = `The CORS policy for this site does not allow access from ${origin}`;
       console.warn('CORS blocked:', origin);
-      return callback(new Error(msg), false);
+      return callback(new Error(`CORS not allowed for ${origin}`), false);
     }
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With']
-}));
+};
 
-// Handle preflight requests
-app.options('*', cors());
+// Apply CORS middleware
+app.use(cors(corsOptions));
+
+// Handle preflight requests - FIXED LINE 49:
+// Instead of app.options('*', cors()), handle specific routes or use:
+app.options('*', (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept, Origin, X-Requested-With');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.status(200).end();
+});
 
 // 4. Body parsers
 app.use(express.json());
@@ -55,7 +56,6 @@ app.use(express.urlencoded({ extended: true }));
 // 5. Logging
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.path} - ${new Date().toISOString()}`);
-  console.log('Origin:', req.headers.origin);
   next();
 });
 
@@ -69,10 +69,7 @@ app.get('/health', (req, res) => {
     message: 'Server is running',
     backendUrl: 'https://urlshortner-backend-afvd.onrender.com',
     timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-    cors: {
-      allowedOrigins: allowedOrigins
-    }
+    uptime: process.uptime()
   });
 });
 
@@ -91,8 +88,7 @@ app.get('/', (req, res) => {
       deactivate: 'PATCH /api/url/deactivate/:shortId',
       delete: 'DELETE /api/url/delete/:shortId',
       health: 'GET /health'
-    },
-    note: 'Make sure your frontend is using the correct backend URL'
+    }
   });
 });
 
@@ -104,44 +100,33 @@ app.use((req, res) => {
   res.status(404).json({
     success: false,
     error: 'Endpoint not found',
-    path: req.path,
-    availableEndpoints: {
-      api: '/api/url/*',
-      redirect: '/:shortId',
-      health: '/health'
-    }
+    path: req.path
   });
 });
 
 // 11. Error handler
 app.use((err, req, res, next) => {
   console.error('Error:', err.message);
-  console.error('Stack:', err.stack);
   
-  // Handle CORS errors specifically
-  if (err.message.includes('CORS policy')) {
+  // Handle CORS errors
+  if (err.message.includes('CORS')) {
     return res.status(403).json({
       success: false,
       error: 'CORS Error',
       message: err.message,
-      allowedOrigins: allowedOrigins,
-      yourOrigin: req.headers.origin,
-      tip: 'Ensure your frontend URL is in the allowedOrigins array'
+      allowedOrigins: allowedOrigins
     });
   }
   
   res.status(500).json({
     success: false,
-    error: 'Internal server error',
-    message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong'
+    error: 'Internal server error'
   });
 });
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`✅ Server running on http://localhost:${PORT}`);
-  console.log(`✅ Deployed at: https://urlshortner-backend-afvd.onrender.com`);
-  console.log(`✅ Frontend URL: https://urlshortner-frontend-lkyq.onrender.com`);
+  console.log(`✅ Server running on port ${PORT}`);
   console.log(`✅ Allowed origins: ${allowedOrigins.join(', ')}`);
 });
 
