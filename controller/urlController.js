@@ -3,9 +3,8 @@ const Url = require('../models/Url');
 const generateShortId = require('../utils/generateShortId');
 const { urlSchema, analyticsSchema } = require('../utils/validators');
 
-class UrlController {
   // Shorten URL
-  async shortenUrl(req, res) {
+  const shortenUrl=async (req, res) => {
     try {
       const { error, value } = urlSchema.validate(req.body);
       if (error) {
@@ -67,7 +66,7 @@ class UrlController {
   }
 
   // Redirect to original URL - FIXED (removed next parameter issue)
-  async redirectUrl(req, res) {
+  const redirectUrl=async (req, res) => {
     try {
       const { shortId } = req.params;
       
@@ -123,7 +122,7 @@ class UrlController {
   }
 
   // Get URL analytics
-  async getUrlAnalytics(req, res) {
+  const getUrlAnalytics=async (req, res) => {
     try {
       const { shortId } = req.params;
       const { error, value } = analyticsSchema.validate(req.query);
@@ -193,11 +192,8 @@ class UrlController {
     }
   }
 
-  // Remove getUserUrls method entirely since we don't have users
-  // Remove deactivateUrl and deleteUrl methods (or keep them public)
-
   // Deactivate URL (public - anyone can deactivate any URL)
-  async deactivateUrl(req, res) {
+  const deactivateUrl=async (req, res) => {
     try {
       const { shortId } = req.params;
 
@@ -229,7 +225,7 @@ class UrlController {
   }
 
   // Delete URL (public - anyone can delete any URL)
-  async deleteUrl(req, res) {
+  const deleteUrl=async (req, res) => {
     try {
       const { shortId } = req.params;
 
@@ -254,6 +250,5 @@ class UrlController {
       });
     }
   }
-}
 
-module.exports = new UrlController();
+module.exports = {shortenUrl, redirectUrl, getUrlAnalytics, deactivateUrl, deleteUrl};

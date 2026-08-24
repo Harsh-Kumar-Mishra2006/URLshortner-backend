@@ -12,7 +12,7 @@ const apiLimiter = rateLimit({
 });
 
 const createAccountLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hour
+  windowMs: 60 * 60 * 1000,
   max: 5,
   message: {
     success: false,

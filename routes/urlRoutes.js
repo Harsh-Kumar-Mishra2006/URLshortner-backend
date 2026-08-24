@@ -1,25 +1,28 @@
 // routes/urlRoutes.js - UPDATED
 const express = require('express');
 const router = express.Router();
-const urlController = require('../controller/urlController');
+const {
+  shortenUrl,
+  getUrlAnalytics,
+  deactivateUrl,
+  deleteUrl
+} = require('../controller/urlController');
 const { apiLimiter } = require('../middleware/rateLimiter');
 
 // Apply rate limiting to all routes
 router.use(apiLimiter);
 
 // Shorten URL
-router.post('/shorten', urlController.shortenUrl);
+router.post('/shorten', shortenUrl);
 
 // Get URL analytics
-router.get('/analytics/:shortId', urlController.getUrlAnalytics);
+router.get('/analytics/:shortId', getUrlAnalytics);
 
 // Deactivate URL (public)
-router.patch('/deactivate/:shortId', urlController.deactivateUrl);
+router.patch('/deactivate/:shortId', deactivateUrl);
 
 // Delete URL (public)
-router.delete('/delete/:shortId', urlController.deleteUrl);
+router.delete('/delete/:shortId', deleteUrl);
 
-// Redirect route will be handled separately in app.js
-// router.get('/:shortId', urlController.redirectUrl);
 
 module.exports = router;

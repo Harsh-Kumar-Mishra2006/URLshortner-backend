@@ -17,7 +17,6 @@ app.use(helmet());
 // 3. CORS - SIMPLIFIED FIX
 const allowedOrigins = [
   'https://urlshortner-frontend-lkyq.onrender.com',
-  'http://localhost:3001',
   'http://localhost:3000'
 ];
 
