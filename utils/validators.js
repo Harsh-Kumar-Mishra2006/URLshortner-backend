@@ -1,8 +1,7 @@
-// utils/validators.js - UPDATED
+// utils/validators.js 
 const Joi = require('joi');
 const validator = require('validator');
 
-// utils/validators.js - Make fields truly optional
 const urlSchema = Joi.object({
   originalUrl: Joi.string()
     .required()
@@ -13,7 +12,7 @@ const urlSchema = Joi.object({
       return value;
     })
     .messages({
-      'any.invalid': 'Please provide a valid URL with protocol (http/https)',
+      'any.invalid': 'Please provide a valid URL with protocol',
       'any.required': 'URL is required'
     }),
   customId: Joi.string()
@@ -21,13 +20,13 @@ const urlSchema = Joi.object({
     .min(3)
     .max(20)
     .optional()
-    .allow(''),  // ADD THIS: Allow empty string
+    .allow(''), 
   expiresIn: Joi.number()
     .integer()
     .min(300)
     .max(2592000)
     .optional()
-    .allow(null)  // ADD THIS: Allow null
+    .allow(null) 
 });
 
 const analyticsSchema = Joi.object({

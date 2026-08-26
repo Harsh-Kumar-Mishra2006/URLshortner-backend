@@ -14,7 +14,7 @@ const { urlSchema, analyticsSchema } = require('../utils/validators');
         });
       }
 
-      const { originalUrl, customId, expiresIn } = value; // No userId
+      const { originalUrl, customId, expiresIn } = value; 
       
       // Check if custom ID already exists
       if (customId) {
@@ -41,7 +41,6 @@ const { urlSchema, analyticsSchema } = require('../utils/validators');
         shortUrl,
         isCustom: !!customId,
         expiresAt
-        // No userId
       });
 
       await url.save();
@@ -65,12 +64,11 @@ const { urlSchema, analyticsSchema } = require('../utils/validators');
     }
   }
 
-  // Redirect to original URL - FIXED (removed next parameter issue)
+  // Redirect to original URL 
   const redirectUrl=async (req, res) => {
     try {
       const { shortId } = req.params;
       
-      // Skip if shortId is reserved path
       const reservedPaths = ['api', 'health', 'favicon.ico', 'robots.txt'];
       if (reservedPaths.includes(shortId)) {
         return res.status(404).json({
@@ -101,7 +99,6 @@ const { urlSchema, analyticsSchema } = require('../utils/validators');
         });
       }
 
-      // Check if URL has expired
       if (url.expiresAt && url.expiresAt < new Date()) {
         url.isActive = false;
         await url.save();
@@ -146,7 +143,6 @@ const { urlSchema, analyticsSchema } = require('../utils/validators');
         });
       }
 
-      // Filter click data by date range
       let filteredClicks = url.clickData;
       if (startDate || endDate) {
         filteredClicks = url.clickData.filter(click => {
@@ -192,7 +188,7 @@ const { urlSchema, analyticsSchema } = require('../utils/validators');
     }
   }
 
-  // Deactivate URL (public - anyone can deactivate any URL)
+  // Deactivate URL 
   const deactivateUrl=async (req, res) => {
     try {
       const { shortId } = req.params;
@@ -224,7 +220,7 @@ const { urlSchema, analyticsSchema } = require('../utils/validators');
     }
   }
 
-  // Delete URL (public - anyone can delete any URL)
+  // Delete URL 
   const deleteUrl=async (req, res) => {
     try {
       const { shortId } = req.params;

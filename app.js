@@ -1,3 +1,4 @@
+//app.js
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -8,25 +9,23 @@ const connectDB = require('./config/database');
 
 const app = express();
 
-// 1. Connect to DB
+//  Connecting to DB
 connectDB();
 
-// 2. Helmet security
+//  Helmet security
 app.use(helmet());
 
-// 3. CORS - SIMPLIFIED FIX
+//  CORS 
 const allowedOrigins = [
   'https://urlshortner-frontend-lkyq.onrender.com',
   'http://localhost:3000'
 ];
 
-// Configure CORS properly
+// Configuring CORS properly
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     
-    // Allow all origins in development or if origin is in allowed list
     if (process.env.NODE_ENV === 'development' || allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
@@ -40,23 +39,22 @@ const corsOptions = {
   exposedHeaders: ['Content-Range', 'X-Content-Range']
 };
 
-// Apply CORS middleware - this handles preflight automatically
 app.use(cors(corsOptions));
 
-// 4. Body parsers
+//  Body parsers
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// 5. Logging middleware
+//  Logging middleware
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.path} - Origin: ${req.headers.origin || 'No origin'} - ${new Date().toISOString()}`);
   next();
 });
 
-// 6. Routes
+//  Routes
 app.use('/api/url', urlRoutes);
 
-// 7. Health check endpoint
+//  Health check endpoint
 app.get('/health', (req, res) => {
   res.status(200).json({
     success: true,
@@ -69,7 +67,7 @@ app.get('/health', (req, res) => {
   });
 });
 
-// 8. Root endpoint
+//  Root endpoint
 app.get('/', (req, res) => {
   res.status(200).json({
     success: true,
@@ -89,10 +87,10 @@ app.get('/', (req, res) => {
   });
 });
 
-// 9. Redirect route (MUST be last route before 404)
+//  Redirect route
 app.get('/:shortId', urlController.redirectUrl);
 
-// 10. 404 handler
+//  404 handler
 app.use((req, res) => {
   res.status(404).json({
     success: false,
@@ -110,11 +108,11 @@ app.use((req, res) => {
   });
 });
 
-// 11. Error handler
+//  Error handler
 app.use((err, req, res, next) => {
   console.error('Server Error:', err.message);
   
-  // Handle CORS errors
+  // Handling CORS errors
   if (err.message.includes('CORS') || err.message.includes('Not allowed by CORS')) {
     return res.status(403).json({
       success: false,
@@ -135,11 +133,11 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`🚀 Server is running on port ${PORT}`);
-  console.log(`✅ Backend URL: https://urlshortner-backend-afvd.onrender.com`);
-  console.log(`✅ Allowed CORS origins: ${allowedOrigins.join(', ')}`);
-  console.log(`✅ Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`✅ Health check: https://urlshortner-backend-afvd.onrender.com/health`);
+  console.log(` Server is running on port ${PORT}`);
+  console.log(` Backend URL: https://urlshortner-backend-afvd.onrender.com`);
+  console.log(` Allowed CORS origins: ${allowedOrigins.join(', ')}`);
+  console.log(` Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(` Health check: https://urlshortner-backend-afvd.onrender.com/health`);
 });
 
 module.exports = app;

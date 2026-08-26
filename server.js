@@ -1,24 +1,24 @@
-// server.js - SERVER STARTER FILE
+// server.js 
 require('dotenv').config();
-const app = require('./app'); // Import the app from app.js
-const connectDB = require('./config/database'); // If you have DB connection
+const app = require('./app'); 
+const connectDB = require('./config/database'); 
 
 const PORT = process.env.PORT || 3000;
 
-// Connect to database (if you have this)
+// Connect to database
 if (process.env.NODE_ENV !== 'test') {
   connectDB().then(() => {
-    console.log('✅ Database connected');
+    console.log(' Database connected');
   }).catch((err) => {
-    console.error('❌ Database connection error:', err);
+    console.error(' Database connection error:', err);
     process.exit(1);
   });
 }
 
 // Start server
 const server = app.listen(PORT, () => {
-  console.log(`✅ Server running on http://localhost:${PORT}`);
-  console.log(`✅ Health check: http://localhost:${PORT}/health`);
+  console.log(` Server running on http://localhost:${PORT}`);
+  console.log(` Health check: http://localhost:${PORT}/health`);
 });
 
 // Handle graceful shutdown
