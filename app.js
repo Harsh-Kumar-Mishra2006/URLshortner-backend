@@ -5,6 +5,8 @@ const cors = require('cors');
 const helmet = require('helmet');
 const urlRoutes = require('./routes/urlRoutes');
 const urlController = require('./controller/urlController');
+const mongoSanitize = require('express-mongo-sanitize');
+const hpp = require('hpp');
 const connectDB = require('./config/database');
 
 const app = express();
@@ -13,7 +15,11 @@ const app = express();
 connectDB();
 
 //  Helmet security
+app.set('trust proxy', 1);          // needed for req.ip to be real IP behind proxy
 app.use(helmet());
+app.use(express.json({ limit: '10kb' }));   // cap body size
+app.use(mongoSanitize());            // strips $ and . from req.body/query/params
+app.use(hpp());
 
 //  CORS 
 const allowedOrigins = [
