@@ -14,11 +14,10 @@ const app = express();
 //  Connecting to DB
 connectDB();
 
-//  Helmet security
-app.set('trust proxy', 1);          // needed for req.ip to be real IP behind proxy
+app.set('trust proxy', 1);          
 app.use(helmet());
-app.use(express.json({ limit: '10kb' }));   // cap body size
-app.use(mongoSanitize());            // strips $ and . from req.body/query/params
+app.use(express.json({ limit: '10kb' }));   
+app.use(mongoSanitize());           
 app.use(hpp());
 
 //  CORS 
