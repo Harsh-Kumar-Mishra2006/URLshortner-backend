@@ -1,20 +1,27 @@
-# Use official Node.js LTS (alpine = lightweight ~50MB)
+# Use the lightweight Alpine version of Node.js 20
 FROM node:20-alpine
 
-# Set working directory inside container
+# Set the working directory inside the container
 WORKDIR /app
 
-# Copy package files first (better layer caching)
+# Copy only the package files first to leverage Docker layer caching
 COPY package*.json ./
 
-# Install only production dependencies
-RUN npm ci --only=production
+# Install ALL dependencies (we need devDependencies here temporarily if we wanted to run tests, 
+# but for a production image, we omit them to keep it small. See note below).
+RUN npm install --omit=dev
 
-# Copy rest of the source code
+# Copy the rest of the application code
 COPY . .
 
-# Expose the port your app runs on (default 3000)
+# Set the environment to production by default
+ENV NODE_ENV=production
+
+# Run the app as a non-root user for security
+USER node
+
+# Expose the port your app runs on (assuming 3000 based on your code)
 EXPOSE 3000
 
-# Start the app
-CMD ["node", "app.js"]
+# Start the application
+CMD ["npm", "start"]
